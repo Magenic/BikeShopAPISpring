@@ -1,0 +1,62 @@
+# TODO: If you are running into any issues during startup, uncomment
+# the following line.
+# debug: true
+info:
+  app:
+    name: BikeShop
+    description: Java REST API for the BikeShop app.
+    version: 0.0.1-SNAPSHOT
+  java-vendor: ${java.specification.vendor}
+
+# Using Jetty for the server, and only 5 threads to reduce the
+# amount of memory required.
+server:
+  jetty:
+    acceptors: 5
+
+logging:
+  pattern:
+    console: "%d [%t] %-5p - %m%n"
+
+spring:
+  main:
+    banner-mode: "off"
+    allow-bean-definition-overriding: true
+# When, or if, this project is upgraded to Spring Boot 2.2, this is documented
+# as a way to shut off eagar initialization, which should increase startup 
+# performance of Spring Boot in PCF quite a bit.
+#    lazy-initialization: true
+
+management:
+  endpoint:
+    health:
+      show-details: "ALWAYS"
+  endpoints:
+    web:
+      exposure:
+        include:
+        - health
+        - info
+        # - env
+        - metrics
+        - my-endpoint
+
+---
+spring:
+  profiles: "local"
+  datasource:
+    url: "jdbc:h2:mem:testdb"
+    username: "sa"
+    password:
+    driver-class-name: "org.h2.Driver"
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+
+---
+spring:
+  profiles: "mysql"
+  jpa:
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQL5Dialect
+    hibernate:
+      ddl-auto: update

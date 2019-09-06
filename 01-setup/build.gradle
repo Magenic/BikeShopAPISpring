@@ -1,0 +1,35 @@
+plugins {
+	id 'org.springframework.boot' version '2.1.7.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+	id 'java'
+	id 'checkstyle'
+}
+
+group = 'com.magenic'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+	mavenCentral()
+}
+
+configurations {
+  compileOnly {
+    extendsFrom annotationProcessor
+  }
+}
+
+dependencies {
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	implementation('org.springframework.boot:spring-boot-starter-web') {
+		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+	}
+	implementation('org.springframework.boot:spring-boot-starter-jetty')
+	testImplementation('org.springframework.boot:spring-boot-starter-test')
+}
+
+checkstyle {
+	toolVersion = 8.21
+	configFile = rootProject.file('config/checkstyle/checkstyle.xml')
+}

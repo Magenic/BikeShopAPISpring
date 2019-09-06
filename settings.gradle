@@ -1,0 +1,10 @@
+rootProject.name = 'bike-shop-api-spring'
+
+// Include all of the sub projects here so they can all be easily
+// cleaned, tested, and built.
+include '01-setup'
+include '02-connectors'
+include '03-configuration'
+include '04-management'
+include '05-circuit-breaking'
+include '07-swagger'
