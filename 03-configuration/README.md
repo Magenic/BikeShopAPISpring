@@ -9,22 +9,6 @@ which is one of the factors in [The Twelve-Factor App](https://12factor.net/).**
 This lab continues from the _Connectors_ lab, so you will want to make sure that 
 you have completed that lab before continuing onto this one.
 
-### Open BikeShop
-
-1. Open the solution folder `~/Workspace/cloud-native-lab` in your favorite
-Integrated Development Environment (IDE).
-
-2. Open a terminal and change directories.
-
-    ```bash
-    cd ~/Workspace/cloud-native-lab
-    ```
-
-> Note: To view the code for this lab, view the `Configuration` branch in the source
-> code repository.
-
----
-
 ## Add Dependencies
 
 There are some dependencies that, when added to Spring, will assist in automatically configuring the configuration server for Spring in Pivotal Cloud Foundry (PCF).

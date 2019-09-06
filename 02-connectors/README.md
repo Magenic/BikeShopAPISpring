@@ -4,19 +4,6 @@
 
 This lab continues from the SetUp lab and assumes that you have all of the work in that lab completed.
 
-### Open BikeShop
-
-1. Open the solution folder `~/Workspace/cloud-native-lab` in your favorite
-Integrated Development Environment (IDE).
-
-2. Open a terminal and change directories.
-
-    ```bash
-    cd ~/Workspace/cloud-native-lab
-    ```
-
----
-
 ### Adding New Dependencies
 
 There are some dependencies that, when added to Spring, will assist in automatically configuring the data repositories for Spring in Pivotal Cloud Foundry (PCF).
@@ -25,24 +12,20 @@ Add the following dependencies to your `build.gradle` file.
 
 ```gradle
 dependencies {
-	compileOnly('org.projectlombok:lombok')
-	implementation 'org.apache.httpcomponents:httpclient:4.5.6'
-	implementation('org.springframework.boot:spring-boot-starter-cloud-connectors')
-	implementation('org.springframework.boot:spring-boot-starter-data-jpa')
-	implementation('org.springframework.boot:spring-boot-starter-web')
-	runtimeOnly('mysql:mysql-connector-java')
-	runtimeOnly('com.h2database:h2')
-	testImplementation('org.springframework.boot:spring-boot-starter-test')
+  compileOnly('org.projectlombok:lombok')
+  implementation 'org.apache.httpcomponents:httpclient:4.5.6'
+  implementation('org.springframework.boot:spring-boot-starter-cloud-connectors')
+  implementation('org.springframework.boot:spring-boot-starter-data-jpa')
+  implementation('org.springframework.boot:spring-boot-starter-web')
+  runtimeOnly('mysql:mysql-connector-java')
+  runtimeOnly('com.h2database:h2')
+  testImplementation('org.springframework.boot:spring-boot-starter-test')
 }
 ```
 
-
-
----
-
 ## Adding a New Model
 
-The `ValuesController` in the _SetUp_ lab simply returned a list of hard-coded values, but for this lab you will see how a model using JPA (Java Persistence API) code can be used to define a structure both in the database and in HTTP request and response messages. 
+The `ValuesController` in the _SetUp_ lab simply returned a list of hard-coded values, but for this lab you will see how a model using JPA (Java Persistence API) code can be used to define a structure both in the database and in HTTP request and response messages.
 
 > Note: in many production environments, there may be different classes to represent messages and data structures. For this lab, it is okay to keep things simple for clarity.
 
@@ -51,16 +34,16 @@ Add the **Bicycle** model object by following these steps below.
 1. Create a `models` directory.
 
    ```bash
-   mkdir -p ./src/main/java/com/magenic/cloudnativelab/models
+   mkdir -p ./src/main/java/com/magenic/bikeshopapi/models
    ```
 
-1. Create a `Bicycle.java` file in the `src/main/java/com/magenic/cloudnativelab/models`
+1. Create a `Bicycle.java` file in the `src/main/java/com/magenic/bikeshopapi/models`
 directory.
 
 1. Add the following contents to `Bicycle.java` file.
 
     ```java
-    package com.magenic.cloudnativelab.models;
+    package com.magenic.bikeshopapi.models;
 
     import lombok.AllArgsConstructor;
     import lombok.Data;
@@ -96,17 +79,17 @@ In Spring, this is mostly done for you when you create an interface that extends
 1. Create the `repositories` directory.
 
     ```bash
-    mkdir -p ./src/main/java/com/magenic/cloudnativelab/repositories
+    mkdir -p ./src/main/java/com/magenic/bikeshopapi/repositories
     ```
 
-2. Create a `BicycleRepository.java` file in the `src/main/java/com/magenic/cloudnativelab/repositories` directory.
+2. Create a `BicycleRepository.java` file in the `src/main/java/com/magenic/bikeshopapi/repositories` directory.
 
 3. Add the following contents to the `BicycleRepository.java` file.
 
     ```java
-    package com.magenic.cloudnativelab.repositories;
+    package com.magenic.bikeshopapi.repositories;
 
-    import com.magenic.cloudnativelab.models.Bicycle;
+    import com.magenic.bikeshopapi.models.Bicycle;
     import org.springframework.data.repository.CrudRepository;
 
     /**
@@ -115,8 +98,6 @@ In Spring, this is mostly done for you when you create an interface that extends
     public interface BicycleRepository extends CrudRepository<Bicycle, Long> {
     }
     ```
-
----
 
 ## Adding a Service
 
@@ -128,20 +109,20 @@ However, in most production scenerios the service adds additional value, such a 
 1. Create the `services` directory.
 
     ```bash
-    mkdir -p ./src/main/java/com/magenic/cloudnativelab/services
+    mkdir -p ./src/main/java/com/magenic/bikeshopapi/services
     ```
 
-2. Create a `BicycleService.java` file in the `src/main/java/com/magenic/cloudnativelab/services` directory.
+2. Create a `BicycleService.java` file in the `src/main/java/com/magenic/bikeshopapi/services` directory.
 
 3. Add the following to the `BicycleService.java` file.
 
     ```java
-    package com.magenic.cloudnativelab.services;
+    package com.magenic.bikeshopapi.services;
 
     import java.util.Optional;
 
-    import com.magenic.cloudnativelab.models.Bicycle;
-    import com.magenic.cloudnativelab.repositories.BicycleRepository;
+    import com.magenic.bikeshopapi.models.Bicycle;
+    import com.magenic.bikeshopapi.repositories.BicycleRepository;
 
     import org.springframework.stereotype.Component;
 
@@ -168,23 +149,21 @@ However, in most production scenerios the service adds additional value, such a 
     }    
     ```
 
----
-
 ## Adding a Controller
 
 In Spring, a class marked with the `RestController` attribute can be used to define methods that handle
 the HTTP requests. In this step, you will add a controller that handles basic GET and POST requests using the `GetMapping` and `PostMapping`, respectively.
 
-1. Create a `BicycleController.java` file in the `src/main/java/com/magenic/cloudnativelab/controllers` directory.
+1. Create a `BicycleController.java` file in the `src/main/java/com/magenic/bikeshopapi/controllers` directory.
 
 1. Add the following to the `BicycleController.java` file.
 
     ```java
-    package com.magenic.cloudnativelab.controllers;
+    package com.magenic.bikeshopapi.controllers;
 
-    import com.magenic.cloudnativelab.models.Bicycle;
-    import com.magenic.cloudnativelab.models.ItemNotFoundException;
-    import com.magenic.cloudnativelab.services.BicycleService;
+    import com.magenic.bikeshopapi.models.Bicycle;
+    import com.magenic.bikeshopapi.models.ItemNotFoundException;
+    import com.magenic.bikeshopapi.services.BicycleService;
     import org.springframework.web.bind.annotation.GetMapping;
     import org.springframework.web.bind.annotation.PathVariable;
     import org.springframework.web.bind.annotation.PostMapping;
@@ -244,22 +223,20 @@ This new controller will only service three enddpoints for now. Two of them are 
 
 One HTTP POST endpoint allows you to add new objects to the data store.
 
----
-
 ## Adding a Database Initializer
 
 A database initializer will pre-populate the data repository with some values so there is something
 interesting to see when the service is first started. 
 
-1. Create a `BicycleDbInitialize.java` file in the `src/main/java/com/magenic/cloudnativelab` directory.
+1. Create a `BicycleDbInitialize.java` file in the `src/main/java/com/magenic/bikeshopapi` directory.
 
 2. Add the following to the `BicycleDbInitialize.java` file.
 
     ```java
-    package com.magenic.cloudnativelab;
+    package com.magenic.bikeshopapi;
 
-    import com.magenic.cloudnativelab.models.Bicycle;
-    import com.magenic.cloudnativelab.repositories.BicycleRepository;
+    import com.magenic.bikeshopapi.models.Bicycle;
+    import com.magenic.bikeshopapi.repositories.BicycleRepository;
     import lombok.extern.slf4j.Slf4j;
     import org.springframework.boot.CommandLineRunner;
     import org.springframework.context.annotation.Bean;
@@ -286,19 +263,17 @@ interesting to see when the service is first started.
 
 When the Spring project starts up for the first time, this code will run and will use the repository (`BicycleRepository`) to add the objects.
 
----
-
 ## Updating the Configuration
 
 This project uses [Java config in Spring](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Configuration.html) to configure the data source (implementation of the `DataSource` interface) 
 for the `cloud` profile. 
 
-1. Create a `CloudDataSourceConfig.java` file in the `src/main/java/com/magenic/cloudnativelab` directory.
+1. Create a `CloudDataSourceConfig.java` file in the `src/main/java/com/magenic/bikeshopapi` directory.
 
 1. Add the following contents to the `CloudDataSourceConfig.java` file.
 
     ```java
-    package com.magenic.cloudnativelab;
+    package com.magenic.bikeshopapi;
 
     import org.springframework.cloud.config.java.AbstractCloudConfig;
     import org.springframework.context.annotation.Bean;
@@ -355,9 +330,7 @@ spring:
 
 ```
 
-
-
-## Creating the Database 
+## Creating the Database
 
 1. Make sure you are logged in the PCF foundation:
 
