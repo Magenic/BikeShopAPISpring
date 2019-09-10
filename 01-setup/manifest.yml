@@ -1,8 +1,5 @@
 applications:
-- name: BikeShop
-  # I created a fork of the default buildpack with some optimizations
-  buildpacks:
-    - https://github.com/nathanagood/java-buildpack.git
+- name: BikeShopAPI
   disk_quota: 512M
   instances: 1
   # Timeout here was increased to three minutes over the default of 1 minute
@@ -11,14 +8,11 @@ applications:
   timeout: 180
   memory: 256M
   random-route: true
-  stack: cflinuxfs2
-  path: build/libs/cloud-native-lab-0.0.1-SNAPSHOT.jar
+  stack: cflinuxfs3
+  path: build/libs/bike-shop-api-spring-0.0.1-SNAPSHOT.jar
   # JAVA_OPTS and buildpack options have been added to tweak down the amount of
   # memory required by the application, and also to specify running the latest
   # version of the JDK (it's okay if you are using older bytecode).
   env:
     JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 11.+ }, memory_calculator: { stack_threads: 20 } }'
-    JAVA_OPTS: '-Xss256K -Xms1M -XX:+UseSerialGC -Djava.compiler=none -XX:ReservedCodeCacheSize=40M -XX:MaxDirectMemorySize=1M -Xverify:none -XX:TieredStopAtLevel=1'
-    SPRING_PROFILES_ACTIVE: cloud,mysql
-  services:
-    - mysql
+    JAVA_OPTS: '-Xss256k -Xms1M -XX:+UseSerialGC -Djava.compiler=none -XX:ReservedCodeCacheSize=40M -XX:MaxDirectMemorySize=1M -Xverify:none -XX:TieredStopAtLevel=1'

@@ -15,7 +15,7 @@ To do each of the labs, you should have the following installed and configured:
    1. IDEA IntelliJ
    1. SpringSource Tool Suite
 1. The [Java JDK from OpenJDK](http://openjdk.java.net/install/index.html).
-1. The CloudFoundry CLI (see https://docs.run.pivotal.io/cf-cli/install-go-cli.html)
+1. The [CloudFoundry CLI](https://docs.run.pivotal.io/cf-cli/install-go-cli.html).
 
 ## Overview
 

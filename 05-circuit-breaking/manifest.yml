@@ -1,8 +1,8 @@
 applications:
 - name: BikeShop
   # I created a fork of the default buildpack with some optimizations 
-  buildpacks: 
-    - https://github.com/nathanagood/java-buildpack.git
+  # buildpacks: 
+  #   - https://github.com/nathanagood/java-buildpack.git
   disk_quota: 512M
   instances: 1
   # Timeout here was increased to three minutes over the default of 1 minute
