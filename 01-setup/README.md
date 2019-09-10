@@ -41,9 +41,9 @@ new Spring Boot-based REST API and deploy it!
 1. Generate a new Spring Boot project called "BikeShop".
 
      ``` bash
-     $ http 'https://start.spring.io/starter.zip?type=gradle-project&language=java&bootVersion=2.1.7.RELEASE&baseDir=bike-shop-api-spring&groupId=com.magenic&artifactId=bike-shop-api-spring&name=bike-shop-api-spring&description=This+is+the+BikeShop+REST+API+implemented+in+SpringpackageName=com.magenic.bikeshopapi&packaging=jar&javaVersion=11&dependenicies=web,actuator' > project.zip
+     $ http 'https://start.spring.io/starter.zip?type=gradle-project&language=java&bootVersion=2.1.7.RELEASE&baseDir=bike-shop-api-spring&groupId=com.magenic&artifactId=bike-shop-api&name=bike-shop-api&description=This+is+the+BikeShop+REST+API+implemented+in+SpringpackageName=com.magenic.bikeshopapi&packaging=jar&javaVersion=11&dependenicies=web,actuator' > project.zip
      $ unzip project.zip
-     $ cd bike-shop-api-spring
+     $ cd bike-shop-api
      ```
 
 2. Create a simple web controller with the contents shown here and save to `src/main/java/com/magenic/bikeshopapi/controllers/ValuesController.java`:
@@ -71,67 +71,67 @@ new Spring Boot-based REST API and deploy it!
      @RestController
      public class ValuesController {
 
-     /**
-     * List of seed values.
-     */
-     private static final List<String> VALUES = Arrays.asList(
-          new String[] {"value1", "value2"});
+          /**
+          * List of seed values.
+          */
+          private static final List<String> VALUES = Arrays.asList(
+               new String[] {"value1", "value2"});
 
-     /**
-     * Returns the full list of values.
-     * @return A {@see List} of {@see #VALUES}.
-     */
-     @GetMapping("/api/values")
-     public ResponseEntity<List<String>> getValues() {
-     return new ResponseEntity<>(VALUES, HttpStatus.OK);
-     }
+          /**
+          * Returns the full list of values.
+          * @return A {@see List} of {@see #VALUES}.
+          */
+          @GetMapping("/api/values")
+          public ResponseEntity<List<String>> getValues() {
+          return new ResponseEntity<>(VALUES, HttpStatus.OK);
+          }
 
-     /**
-     * Returns the specific value with the given ID.
-     * @param id Identifier for the value.
-     * @return The updated value.
-     */
-     @GetMapping("/api/values/{id}")
-     public ResponseEntity<String> getValue(@PathVariable final String id) {
-     return new ResponseEntity<>("value", HttpStatus.OK);
-     }
+          /**
+          * Returns the specific value with the given ID.
+          * @param id Identifier for the value.
+          * @return The updated value.
+          */
+          @GetMapping("/api/values/{id}")
+          public ResponseEntity<String> getValue(@PathVariable final String id) {
+          return new ResponseEntity<>("value", HttpStatus.OK);
+          }
 
-     /**
-     * Creates the value.
-     * @param value The value.
-     * @return The value.
-     */
-     @PostMapping("api/values")
-     public ResponseEntity<String> postValue(@RequestBody final String value) {
-     return new ResponseEntity<>(value, HttpStatus.CREATED);
-     }
+          /**
+          * Creates the value.
+          * @param value The value.
+          * @return The value.
+          */
+          @PostMapping("api/values")
+          public ResponseEntity<String> postValue(@RequestBody final String value) {
+          return new ResponseEntity<>(value, HttpStatus.CREATED);
+          }
 
-     /**
-     * Updates the given value at the ID.
-     * @param id Identifier for the value.
-     * @param value The value.
-     * @return Returns {@see HttpStatus#OK} if the operation was successful.
-     */
-     @PutMapping("/api/values/{id}")
-     public ResponseEntity<String> putValue(@PathVariable final String id,
-          @RequestBody final String value) {
-     return new ResponseEntity<>(value, HttpStatus.OK);
-     }
+          /**
+          * Updates the given value at the ID.
+          * @param id Identifier for the value.
+          * @param value The value.
+          * @return Returns {@see HttpStatus#OK} if the operation was successful.
+          */
+          @PutMapping("/api/values/{id}")
+          public ResponseEntity<String> putValue(@PathVariable final String id,
+               @RequestBody final String value) {
+          return new ResponseEntity<>(value, HttpStatus.OK);
+          }
 
-     /**
-     * Deletes the given value.
-     * @param id Identifier of the value.
-     * @return Returns {@link HttpStatus#NO_CONTENT}
-     */
-     @DeleteMapping("/api/values/{id}")
-     public ResponseEntity<Void> deleteValue(@PathVariable final String id) {
-     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-     }
+          /**
+          * Deletes the given value.
+          * @param id Identifier of the value.
+          * @return Returns {@link HttpStatus#NO_CONTENT}
+          */
+          @DeleteMapping("/api/values/{id}")
+          public ResponseEntity<Void> deleteValue(@PathVariable final String id) {
+          return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+          }
 
      }
      ```
 
-If you want to try the API locally, run the command `../gradlew bootRun` to run
+If you want to try the API locally, run the command `./gradlew bootRun` to run
 the example locally.
 
 ## Pushing to Pivotal Cloud Foundry (PCF)
@@ -151,7 +151,7 @@ applications:
   memory: 256M
   random-route: true
   stack: cflinuxfs3
-  path: build/libs/bike-shop-api-spring-0.0.1-SNAPSHOT.jar
+  path: build/libs/bike-shop-api-0.0.1-SNAPSHOT.jar
   # JAVA_OPTS and buildpack options have been added to tweak down the amount of
   # memory required by the application, and also to specify running the latest
   # version of the JDK (it's okay if you are using older bytecode).
@@ -177,7 +177,7 @@ applications:
 1. Build the Spring Boot "uber" jar.
 
    ```bash
-   $ ../gradlew clean bootJar
+   $ ./gradlew clean bootJar
    ```
 
 1. Push the BikeShop Java API

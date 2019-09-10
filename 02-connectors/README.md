@@ -12,14 +12,17 @@ Add the following dependencies to your `build.gradle` file.
 
 ```gradle
 dependencies {
-  compileOnly('org.projectlombok:lombok')
-  implementation 'org.apache.httpcomponents:httpclient:4.5.6'
-  implementation('org.springframework.boot:spring-boot-starter-cloud-connectors')
-  implementation('org.springframework.boot:spring-boot-starter-data-jpa')
-  implementation('org.springframework.boot:spring-boot-starter-web')
-  runtimeOnly('mysql:mysql-connector-java')
-  runtimeOnly('com.h2database:h2')
-  testImplementation('org.springframework.boot:spring-boot-starter-test')
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	implementation('org.springframework.boot:spring-boot-starter-cloud-connectors')
+	implementation('org.springframework.boot:spring-boot-starter-data-jpa')
+	implementation('org.springframework.boot:spring-boot-starter-web') {
+		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+	}
+	implementation('org.springframework.boot:spring-boot-starter-jetty')
+	runtimeOnly('mysql:mysql-connector-java')
+	runtimeOnly('com.h2database:h2')
+	testImplementation('org.springframework.boot:spring-boot-starter-test')
 }
 ```
 
@@ -30,12 +33,6 @@ The `ValuesController` in the _SetUp_ lab simply returned a list of hard-coded v
 > Note: in many production environments, there may be different classes to represent messages and data structures. For this lab, it is okay to keep things simple for clarity.
 
 Add the **Bicycle** model object by following these steps below.
-
-1. Create a `models` directory.
-
-   ```bash
-   mkdir -p ./src/main/java/com/magenic/bikeshopapi/models
-   ```
 
 1. Create a `Bicycle.java` file in the `src/main/java/com/magenic/bikeshopapi/models`
 directory.
@@ -146,7 +143,7 @@ However, in most production scenerios the service adds additional value, such a 
         public Bicycle createBicycle(Bicycle bicycle) {
             return this.repository.save(bicycle);
         }
-    }    
+    }
     ```
 
 ## Adding a Controller
@@ -219,14 +216,16 @@ the HTTP requests. In this step, you will add a controller that handles basic GE
     }
     ```
 
-This new controller will only service three enddpoints for now. Two of them are endpoints that handle HTTP GET requests: `/api/bicycle`, which returns all of the objects from the data store and `/api/bicycle/{id}`, which returns a single object.
+This new controller will only service three enddpoints for now. Two of them are
+endpoints that handle HTTP GET requests: `/api/bicycle`, which returns all of
+the objects from the data store and `/api/bicycle/{id}`, which returns a single object.
 
 One HTTP POST endpoint allows you to add new objects to the data store.
 
 ## Adding a Database Initializer
 
-A database initializer will pre-populate the data repository with some values so there is something
-interesting to see when the service is first started. 
+A database initializer will pre-populate the data repository with some values so
+there is something interesting to see when the service is first started.
 
 1. Create a `BicycleDbInitialize.java` file in the `src/main/java/com/magenic/bikeshopapi` directory.
 
@@ -261,12 +260,12 @@ interesting to see when the service is first started.
     }
     ```
 
-When the Spring project starts up for the first time, this code will run and will use the repository (`BicycleRepository`) to add the objects.
+When the Spring project starts up for the first time, this code will run and
+will use the repository (`BicycleRepository`) to add the objects.
 
 ## Updating the Configuration
 
-This project uses [Java config in Spring](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Configuration.html) to configure the data source (implementation of the `DataSource` interface) 
-for the `cloud` profile. 
+This project uses [Java config in Spring](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Configuration.html) to configure the data source (implementation of the `DataSource` interface) for the `cloud` profile.
 
 1. Create a `CloudDataSourceConfig.java` file in the `src/main/java/com/magenic/bikeshopapi` directory.
 
@@ -293,9 +292,9 @@ for the `cloud` profile.
     }
     ```
 
-After adding the Java configuration, there are a few changes to make for the `application.yml` file that
-set some configuration values specific to `mysql` profile. Edit the `src/main/resources/application.yml`
-to look like this:
+After adding the Java configuration, there are a few changes to make for the
+`application.yml` file that set some configuration values specific to `mysql`
+profile. Edit the `src/main/resources/application.yml` to look like this:
 
 ```yaml
 # TODO: If you are running into any issues during startup, uncomment
@@ -335,12 +334,7 @@ spring:
 1. Make sure you are logged in the PCF foundation:
 
     ```bash
-    cf target
-    ```
-
-2. You will see the following output:
-
-    ```bash
+    $ cf target
     api endpoint:   https://api.cf.magenic.net
     api version:    2.112.0
     user:           [YOUR USER NAME]@magenic.com
@@ -351,12 +345,7 @@ spring:
 3. Check and see what services are available:
 
     ```bash
-    cf marketplace
-    ```
-
- 4. Should give you the following results:
-
-    ```bash
+    $ cf marketplace
     service                       plans                       description
     app-autoscaler                standard                    Scales bound applications in response to load
     p-circuit-breaker-dashboard   standard                    Circuit Breaker Dashboard for Spring Cloud Applications
@@ -372,52 +361,50 @@ spring:
  5. Create a MySQL instance: (note this take a few mins to complete)
 
     ```bash
-    cf create-service p.mysql db-micro BikeShopDB
-    ```
-
- If you are using the PCF services online, use the following command:
-
-    ```bash
     cf create-service cleardb spark mysql
-    ``` 
-
- 6. Bind BikeShop App to the BikeShopDB (note [YOUR USER NAME] is your user name)
-
-    ```bash
-    cf bind-service BikeShop-API-[YOUR USER NAME] BikeShopDB
     ```
 
 
---- 
 
-## Upating the PCF Manifest
+## Updating the PCF Manifest
 
-There are some updates to the `manifest.yml` to set the Spring cloud profile using the `SPRING_PROFILES_ACTIVE` environment variable and to map the newly-created database service (_mysql_, in this example) to the application.
+There are some updates to the `manifest.yml` to set the Spring cloud profile
+using the `SPRING_PROFILES_ACTIVE` environment variable and to map the
+newly-created database service (_mysql_, in this example) to the application.
 
 Edit the `manifest.yml` file so that it looks like the example  here:
 
 ```yaml
 applications:
-- name: bikeshopapi
-  disk_quota: 1G
+- name: BikeShopAPI
+  disk_quota: 512M
   instances: 1
-  memory: 728M
+  # Timeout here was increased to three minutes over the default of 1 minute
+  # because cranking down the memory settings makes the startup a bit slower,
+  # presumably because of GC running and probably also using serial GC.
+  timeout: 180
+  memory: 256M
   random-route: true
-  stack: cflinuxfs2
-  path: build/libs/cloud-native-lab-0.0.1-SNAPSHOT.jar
+  stack: cflinuxfs3
+  path: build/libs/bike-shop-api-0.0.1-SNAPSHOT.jar
+  # JAVA_OPTS and buildpack options have been added to tweak down the amount of
+  # memory required by the application, and also to specify running the latest
+  # version of the JDK (it's okay if you are using older bytecode).
   env:
+    JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 11.+ }, memory_calculator: { stack_threads: 20 } }'
+    JAVA_OPTS: '-Xss256k -Xms1M -XX:+UseSerialGC -Djava.compiler=none -XX:ReservedCodeCacheSize=40M -XX:MaxDirectMemorySize=1M -Xverify:none -XX:TieredStopAtLevel=1'
     SPRING_PROFILES_ACTIVE: cloud,mysql
   services:
     - mysql
+
 ```
 
 > Note: If you used _BikeShopDB_ for your database name, use that instead of _mysql_ under the `services` tag.
 
----
-
 ## Pushing the BikeShop API to PCF
 
-1. Build a Spring Boot Java ARchive (JAR) which will include the compiled files and all of the dependencies:
+1. Build a Spring Boot Java ARchive (JAR) which will include the compiled 
+files and all of the dependencies:
 
     ```bash
     ./gradlew bootJar
@@ -426,26 +413,28 @@ applications:
 2. Push BikeShop.API
 
     ```bash
-    cf push bikeshopapi
+    cf push
     ```
-
----
 
 ## Testing the BikeShop API
 
-Since the database should have been prepopulated with a few objects with the database initializer code,
-you should be able to test the API after pushing it with either the browser or a command line tool, 
-such as `http` ([HTTPie](https://httpie.org/)).
+Since the database should have been prepopulated with a few objects with the
+database initializer code, you should be able to test the API after pushing it
+with either the browser or a command line tool, such as `http`
+([HTTPie](https://httpie.org/)).
 
-To test the service, you will need the base URL of your application. Find out the base URL by using
-the command `cf apps` and looking under urls for the _bicycleapi_ app.
+To test the service, you will need the base URL of your application. Find out
+the base URL by using the command `cf apps` and looking under urls for the
+_bicycleapi_ app.
 
-Once you have the base URL, test the `api/bicycle` API by navigating to in with your browser 
-(`https://bikeshop-api-[YOUR AD NAME].cf.magenic.net/api/bicycle/1`) or by typing the command:
+Once you have the base URL, test the `api/bicycle` API by navigating to in with
+your browser
 
-```sh
-http bicycleapi-shiny-numbat.cfapps.io/api/bicycle
+```bash
+$ http http://<YOUR ROUTE>/api/bicycle
 ```
+
+You will get the following output:
 
 ```json
 HTTP/1.1 200 OK
@@ -473,12 +462,13 @@ X-Vcap-Request-Id: c0d9fb70-f7db-40ed-7f2e-35c41cd35f76
 ]
 ```
 
----
-
 ## Summary
 
-So far you have continued from the previous lab by creating a database service and binding it to the application. 
-You added code to configure the database connection and to create sample entries in the database. Finally, 
-you tested the API using a browser or CLI tool to view the JSON output.
+So far you have continued from the previous lab by creating a database service
+and binding it to the application.
+
+You added code to configure the database connection and to create sample entries
+in the database. Finally, you tested the API using a browser or CLI tool to view
+the JSON output.
 
 You can now proceed onto the next lab, _Configuration_.

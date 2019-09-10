@@ -17,24 +17,43 @@ Make sure the `dependencies` section looks like the following in your `build.gra
 also add a `dependencyManagement` section as shown here.
 
 ```gradle
+ext {
+  set('springProfiles', 'development,local')
+  set('springCloudServicesVersion', "2.1.4.RELEASE")
+  set('springCloudVersion', "Greenwich.SR2")
+}
+
 dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:Finchley.RELEASE"
-        mavenBom "io.pivotal.spring.cloud:spring-cloud-services-dependencies:2.0.3.RELEASE"
-	}
+  imports {
+    mavenBom "io.pivotal.spring.cloud:spring-cloud-services-dependencies:${springCloudServicesVersion}"
+    mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+  }
 }
 
 dependencies {
-	compileOnly('org.projectlombok:lombok')
-	implementation 'org.apache.httpcomponents:httpclient:4.5.6'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
 	implementation('org.springframework.boot:spring-boot-starter-actuator')
 	implementation('org.springframework.boot:spring-boot-starter-cloud-connectors')
 	implementation('org.springframework.boot:spring-boot-starter-data-jpa')
-	implementation('org.springframework.boot:spring-boot-starter-web')
+	implementation('org.springframework.boot:spring-boot-starter-web') {
+		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+	}
+	implementation('org.springframework.boot:spring-boot-starter-jetty')
 	implementation('org.springframework.cloud:spring-cloud-starter-config')
+	compile("io.pivotal.spring.cloud:spring-cloud-services-starter-config-client")
+	compile("org.springframework.boot:spring-boot-starter-security")
+	compile("org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure")
+	compile("org.springframework.security:spring-security-rsa")
 	runtimeOnly('mysql:mysql-connector-java')
 	runtimeOnly('com.h2database:h2')
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
+}
+
+bootRun {
+	args = [
+		"--spring.profiles.active=${springProfiles}"
+	]
 }
 ```
 
@@ -51,7 +70,7 @@ Add the following content to the `bootstrap.yml` file:
 ```yaml
 spring:
   application:
-    name: BikeShop
+    name: BikeShopAPI
 ```
 
 ---
@@ -113,7 +132,7 @@ Once you have created this file, you can now use it to configure a new instance 
 config server in PCF.
 
 > Note: If you take a look at this repository, you will find a file in the repository called
-> `BikeShop.yml`. It is important that the name of the application that you set in the 
+> `BikeShopAPI.yml`. It is important that the name of the application that you set in the 
 > `bootstrap.yml` file matches up with the name of the file here (and it is case sensitive)! 
 > In other words, the configuation server will load the file that is called 
 > `[APPLICATION_NAME].yml`, where *[APPLICATION_NAME]* is the name of the application
@@ -124,7 +143,7 @@ config server in PCF.
 To create a new instance of the configuration server in PCF, run the following command:
 
 ```bash
-cf create-service p-config-server standard BikeShopConfigServer -c /PATH/TO/configuration-server.json
+cf create-service p-config-server standard configserver -c /PATH/TO/configuration-server.json
 ```
 
 Where `/PATH/TO` is the full path to the JSON configuration file that you created in the previous
@@ -257,34 +276,26 @@ public class MessageController {
     @GetMapping("/api/message")
     public Message getMessage() {
         LOG.info(String.format("Returning message with values: %s", message.getTitle()));
-        return new MessageBuilder()
-            .setTitle(message.getTitle())
-            .setBody(message.getBody())
-            .build();
+		    return new Message(message.getTitle(), message.getBody());
     }
-
-
 }
+
 ```
 
-You will note that there is a `MessageBuilder` class here that builds a new copy of
-the configured message object. This isn't strictly necessary, but provides an example
-of how you might map to a different object for the response here if you didn't want
-to return the `Message` object directly. 
+## Pushing the BikeShop API to PCF
 
----
-## Push BikeShop to PCF
+1. Build a Spring Boot Java ARchive (JAR) which will include the compiled 
+files and all of the dependencies:
 
-1. Build the project with Gradle using the command `./gradlew clean bootJar`. This 
-command will clean the project and create a new JAR that can be pushed to PCF.
+    ```bash
+    ./gradlew bootJar
+    ```
 
-1. Push the application to PCF
+2. Push BikeShop.API
 
     ```bash
     cf push
     ```
-
----
 
 ### Testing BikeShop API
 
@@ -292,11 +303,9 @@ To test the service, you will need the base URL of your application. Find out th
 
 Once you have the base URL, test the `/api/message` API by navigating to in with your browser or by typing the command:
 
-```sh
-http ${BASE_URL}/api/message
+```bash
+$ http http://<YOUR ROUTE>/api/message
 ```
-
-Where *${BASE_URL}* is the URL route for your app. 
 
 You should see a result like this:
 
@@ -319,8 +328,6 @@ X-Xss-Protection: 1; mode=block
     "title": "Bike Sale this week!"
 }
 ```
-
----
 
 ## Recap
 
