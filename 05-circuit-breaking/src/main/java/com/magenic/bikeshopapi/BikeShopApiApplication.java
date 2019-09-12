@@ -2,11 +2,13 @@ package com.magenic.bikeshopapi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 
 /**
  * Spring Boot application class.
  */
 @SpringBootApplication
+@EnableCircuitBreaker
 public class BikeShopApiApplication {
 
   /**

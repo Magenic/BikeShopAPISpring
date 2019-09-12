@@ -124,9 +124,6 @@ public class BicycleService {
 }
 ```
 
-
----
-
 ### Update the Bicycle Controller
 
 Add new methods to the *BicycleController* to support the HTTP 
@@ -207,6 +204,8 @@ objects you have in your database.
 ---
 
 ### Create a Custom Health Check
+
+Create a `HealthDetails.java` file in the 
 
 Create a `HealthCheck.java` file in the `src/main/java/com/magenic/cloudnativelab/health`
 folder with the following contents:

@@ -23,9 +23,9 @@ In the *Configuration* lab, you created a *MessageController* that used the conf
 *Message* to disply some values. In this circuit breaker example, you will create
 a *MessageService* and do a little refactoring. You will throw an exception, on 
 purpose, and see how the circuit breaker elegantly falls back to another 
-method. 
+method.
 
-Create the `MessageService.java` file in the `src/main/java/com/magenic/cloudnativelab/services` 
+Create the `MessageService.java` file in the `src/main/java/com/magenic/cloudnativelab/services`
 directory with the contents as shown here:
 
 ```java
